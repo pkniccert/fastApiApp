@@ -1,5 +1,12 @@
 from typing import Union
+from enum import Enum
 from fastapi import FastAPI
+
+class foofEnum(str, Enum):
+    fruits = 'fruits'
+    vegetables = 'vegetables'
+    dairy = 'dairy'
+
 
 app = FastAPI()
 
@@ -12,9 +19,23 @@ async def read_get():
 async def read_put():
     return {"message": "This is Put Method"}
 
+@app.get("/food/{food_name}")
+async def get_food(food_name:foofEnum):
+    if food_name is foofEnum.vegetables:
+        return {"food_name": food_name, "message": "You are healthy"}
+    
+    if food_name.value == "fruits":
+        return {"food_name": food_name, "message": "You are still healthy, but like sweet things"}
+    
+    return {"food_name": food_name, "message": "I like chocolate milk"}
+
 @app.post("/")
-async def read_post():
-    return {"message": "This is Post Method"}
+async def read_post(skip: int=0, limit: int=10):
+    return {"message": "This is Post Method", "skip":skip, "limit":limit}
+
+@app.post("/optional/param")
+async def read_post(skip: int | None = None, limit: int | None = None):
+    return {"message": "This is Post Method", "skip":skip, "limit": limit}
 
 @app.get("/users/list")
 async def get_user_list():
