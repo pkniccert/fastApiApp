@@ -1,6 +1,6 @@
-from typing import Union
 from enum import Enum
 from fastapi import FastAPI
+from routers import main_router
 
 class foofEnum(str, Enum):
     fruits = 'fruits'
@@ -10,18 +10,12 @@ class foofEnum(str, Enum):
 
 app = FastAPI()
 
+# Include the main router which includes all sub-routers
+app.include_router(main_router)
 
 @app.get("/")
 async def read_get():
-    return {"message": "This is Get Route"}
-
-@app.put("/")
-async def read_put():
-    return {"message": "This is Put Method"}
-
-@app.post("/")
-async def read_post(skip: int=0, limit: int=10):
-    return {"message": "This is Post Method", "skip":skip, "limit":limit}
+    return {"message": "This is test route"}
 
 @app.get("/food/{food_name}")
 async def get_food(food_name:foofEnum):
@@ -37,25 +31,11 @@ async def get_food(food_name:foofEnum):
 async def read_file(file_path: str):
     return {"file_path": file_path}
 
-@app.post("/optional/param")
-async def read_post(skip: int | None = None, limit: int | None = None):
-    return {"message": "This is Post Method", "skip":skip, "limit": limit}
+fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
 
-@app.get("/users/list")
-async def get_user_list():
-    return {"message": "This is users list"}
-
-@app.get("/users/me")
-async def get_current_user():
-    return {"message": "This is current user"}
-
-@app.get("/users/{user_id}")
-async def get_unique_user(user_id: str):
-    return {"message": "This is unique user", "UserId":user_id}
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+@app.get("/items/")
+async def read_item(skip: int = 0, limit: int = 10):
+    return fake_items_db[skip : skip + limit]
 
 @app.post("/users/{user_id}/items/{item_id}")
 async def read_user_item(user_id: int, item_id: str, q: str | None = None, short: bool = False):
