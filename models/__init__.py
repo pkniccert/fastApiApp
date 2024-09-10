@@ -1,2 +1,2 @@
-from .user_models import User
-from .item_models import Item
+from models.user import User
+from models.item import Item
